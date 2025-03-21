@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  mysql:
+    container_name: ms_mysql
+    image: mysql:8.0.41-debian
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: microservices_demo
+      MYSQL_USER: saonguyen
+      MYSQL_PASSWORD: 290604
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - microservices-net
+    restart: unless-stopped
+
+  phpmyadmin:
+    container_name: ms_phpmyadmin
+    image: phpmyadmin/phpmyadmin
+    environment:
+      PMA_HOST: mysql
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "8888:80"
+    networks:
+      - microservices-net
+    restart: unless-stopped
+  mail-dev:
+    container_name: ms-mail-dev
+    image: maildev/maildev
+    ports:
+      - 1080:1080 # Giao diện web (xem email)
+      - 1025:1025 # Cổng SMTP (nhận email từ ứng dụng)
+  zipkin:
+    container_name: zipkin
+    image: openzipkin/zipkin
+    ports:
+      - "9411:9411"
+    networks:
+      - microservices-net
+
+networks:
+  microservices-net:
+    driver: bridge
+
+volumes:
+  mysql_data:
